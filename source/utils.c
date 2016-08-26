@@ -11,9 +11,9 @@ void PrintDefaultInput(void)
 {
   FILE *fptr;
 
-  if(!(fptr=fopen("input.msd","w")))
+  if(!(fptr=fopen("input.vacf","w")))
   {
-    printf(" Problems opening file: 'input.msd' \n");
+    printf(" Problems opening file: 'input.vacf' \n");
     printf(" Hint: Check rights, can we write to folder?\n");
     exit(5);
   }
@@ -21,14 +21,8 @@ void PrintDefaultInput(void)
   {
     fprintf(fptr,"#blocks   elements\n");
     fprintf(fptr,"10        10      \n");
-    fprintf(fptr,"# box_lo  box_hi  \n");
-    fprintf(fptr,"0.0       100.0   \n");
-    fprintf(fptr,"0.0       100.0   \n");
-    fprintf(fptr,"0.0       100.0   \n");
     fprintf(fptr,"# particle types  \n");
     fprintf(fptr,"2                 \n");
-    fprintf(fptr,"corr. drift ind.p \n");
-    fprintf(fptr,"yes         no    \n");
     fprintf(fptr,"# timestep [ps] \n");
     fprintf(fptr,"0.0010 \n");
     fprintf(fptr,"# for part 1   number of parts.   mass \n");

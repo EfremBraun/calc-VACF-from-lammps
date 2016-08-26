@@ -58,59 +58,6 @@ INPUT_DATA *ReadInput(void)
     printf("Variable MaxElements:   %zu\n",Input->MaxElements);
   }
 
-  
-  // empty line
-  ReadNewLine(line,MaxLineLength,fileptr);
-
-  // box-xdir
-  ReadNewLine(line,MaxLineLength,fileptr);
-  if(!ReadNFloat(2,line,Floats,MaxN))
-  {
-    printf("Unable to read all input on line. xlo and xhi not defined.\n");
-  }
-  else
-  {
-    Input->xlo = Floats[0];
-    Input->xhi = Floats[1];
-    Input->sidex = Input->xhi - Input->xlo;
-    printf("Box with bounds:  xlo   %f\n",Input->xlo);
-    printf("                  xhi   %f\n",Input->xhi);
-    printf("                  sidex %f\n",Input->sidex);
-  }
-
-  // box-ydir
-  ReadNewLine(line,MaxLineLength,fileptr);
-  if(!ReadNFloat(2,line,Floats,MaxN))
-  {
-    printf("Unable to read all input on line. ylo and yhi not defined.\n");
-  }
-  else
-  {
-    Input->ylo = Floats[0];
-    Input->yhi = Floats[1];
-    Input->sidey = Input->yhi - Input->ylo;
-    printf("Box with bounds:  ylo   %f\n",Input->ylo);
-    printf("                  yhi   %f\n",Input->yhi);
-    printf("                  sidey %f\n",Input->sidey);
-  }
-  
-  // box-zdir
-  ReadNewLine(line,MaxLineLength,fileptr);
-  if(!ReadNFloat(2,line,Floats,MaxN))
-  {
-    printf("Unable to read all input on line. zlo and zhi not defined.\n");
-  }
-  else
-  {
-    Input->zlo = Floats[0];
-    Input->zhi = Floats[1];
-    Input->sidez = Input->zhi - Input->zlo;
-    printf("Box with bounds:  zlo   %f\n",Input->zlo);
-    printf("                  zhi   %f\n",Input->zhi);
-    printf("                  sidez %f\n",Input->sidez);
-  }
-
-
   // discard an empty lline
   ReadNewLine(line,MaxLineLength,fileptr);
   // Number of particles
@@ -134,37 +81,6 @@ INPUT_DATA *ReadInput(void)
   }
 
 
-  // discard an empty line
-  ReadNewLine(line,MaxLineLength,fileptr);
-  // logical parameters
-  ReadNewLine(line,MaxLineLength,fileptr);
-  sscanf(line,"%s%[^\n]",keyword,line);
-  if(strcasecmp("yes",keyword)==0)
-  {
-    Input->cdrift = true;
-    printf("Correcting for drift ... true\n");
-  }
-  else
-  {
-    Input->cdrift = false;
-    printf("Correcting for drift ... false\n");
-  }
-
-  sscanf(line,"%s%[^\n]",keyword,line);
-  if(strcasecmp("yes",keyword)==0)
-  {
-    Input->indpart = true;
-    printf("... true\n");
-  }
-  else
-  {
-    Input->indpart = false;
-    printf("... false\n");
-  }
-
-
-
-  
   // Timestep
   ReadNewLine(line,MaxLineLength,fileptr);
 
