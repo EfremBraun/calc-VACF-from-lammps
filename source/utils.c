@@ -23,8 +23,8 @@ void PrintDefaultInput(void)
     fprintf(fptr,"1         1000000\n");
     fprintf(fptr,"# particle types\n");
     fprintf(fptr,"1\n");
-    fprintf(fptr,"# timestep [ps] \n");
-    fprintf(fptr,"0.0010\n");
+    fprintf(fptr,"# timestep [fs] \n");
+    fprintf(fptr,"1.0\n");
     fprintf(fptr,"# for part 1   number of parts.   mass\n");
     fprintf(fptr,"               2000               32.0\n");
     fprintf(fptr,"filename.dat\n");
