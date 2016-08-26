@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+cmake .. -DCMAKE_C_COMPILER=/usr/local/bin/gcc-4.9  -DWITH_TESTING=ON -DCMAKE_BUILD_TYPE=debug
+#-DCMAKE_CXX_COMPILER=/usr/bin/g++

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+cmake .. -DCMAKE_C_COMPILER=/usr/bin/clang -DWITH_TESTING=ON -DCMAKE_BUILD_TYPE=debug
