@@ -33,6 +33,7 @@ void Sample(INPUT_DATA *Input)
   ReadSnap(Input, Snapshot);
   printf(" done\n");
   StoreBlockData(Input,Snapshot,State,SampleTimes,true,BlockLength);
+  CalcMSD(Input,State,SampleMSD,SampleTimes,BlockLength);
   SampleTimes++;
 
   printf("\n\t Sampling ...\n");
@@ -79,7 +80,7 @@ int ReadSnap(INPUT_DATA *Input, SNAPSHOT *snap)
     snap->CentreOfMassZ[comp] = 0.0;
    
     // skip 9 lines
-    for (size_t j=0;j<9;j++) ReadNewLine(line,MaxLineLength,Input->Files[comp]);
+    for (size_t j=0;j<9;j++) chars_read = ReadNewLine(line,MaxLineLength,Input->Files[comp]);
 
     // end of file
     if(chars_read==0)
@@ -324,7 +325,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
 
     sprintf(buffer,"vacf_self_comp_%zu.dat",comp+1);
     fileptr=fopen(buffer,"w");
-    fprintf(fileptr,"# Self diffusion coefficient for component %zu\n",comp+1);
+    fprintf(fileptr,"# VACF for component %zu\n",comp+1);
     fprintf(fileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
     for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
@@ -332,7 +333,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
       size_t CurrentBlockLength = MIN2(BlockLength[CurrBlock],Input->MaxElements);
       double dt =Input->Timestep*pow((double)Input->MaxElements,CurrBlock);
 
-      for(size_t elem=1;elem<CurrentBlockLength;elem++)
+      for(size_t elem=0;elem<CurrentBlockLength;elem++)
       {
         if(SampleMSD->SelfCounter[CurrBlock][elem][comp]>0.0)
         {
@@ -367,7 +368,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
 
       sprintf(buffer,"vacf_onsager_comp_%zu_%zu.dat",comp+1,comp2+1);
       fileptr=fopen(buffer,"w");
-      fprintf(fileptr,"# Onsager coefficient for components %zu--%zu \n",comp+1,comp2+1);
+      fprintf(fileptr,"# Cross VACF (Onsager-ish) coefficient for components %zu--%zu \n",comp+1,comp2+1);
       fprintf(fileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
       for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
@@ -377,7 +378,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
 
         double dt =Input->Timestep*pow((double)Input->MaxElements,CurrBlock);
 
-        for(size_t elem=1;elem<CurrentBlockLength;elem++)
+        for(size_t elem=0;elem<CurrentBlockLength;elem++)
         {
           if(SampleMSD->CrossCounter[CurrBlock][elem][comp][comp2]>0.0)
           {
@@ -405,7 +406,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
   printf("\t Printing average VACF to file ...");
 
   tfileptr=fopen("vacf_total_self.dat","w");
-  fprintf(tfileptr,"# Total Self diffusion coefficient \n");
+  fprintf(tfileptr,"# VACF averaged over all components\n");
   fprintf(tfileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
   for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
@@ -413,7 +414,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
     size_t CurrentBlockLength = MIN2(BlockLength[CurrBlock],Input->MaxElements);
     double dt =Input->Timestep*pow((double)Input->MaxElements,CurrBlock);
 
-    for(size_t elem=1;elem<CurrentBlockLength;elem++)
+    for(size_t elem=0;elem<CurrentBlockLength;elem++)
     {
 
       double val_x = 0.0;
