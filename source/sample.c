@@ -77,8 +77,9 @@ int ReadSnap(INPUT_DATA *Input, SNAPSHOT *snap)
     snap->CentreOfMassX[comp] = 0.0;
     snap->CentreOfMassY[comp] = 0.0;
     snap->CentreOfMassZ[comp] = 0.0;
-    
-    chars_read = ReadNewLine(line,MaxLineLength,Input->Files[comp]);
+   
+    // skip 9 lines
+    for (size_t j=0;j<9;j++) ReadNewLine(line,MaxLineLength,Input->Files[comp]);
 
     // end of file
     if(chars_read==0)
@@ -96,20 +97,17 @@ int ReadSnap(INPUT_DATA *Input, SNAPSHOT *snap)
       if(chars_read!=0)
       {
         double rx,ry,rz;
-        int lx =INT_MAX;
-        int ly =INT_MAX;
-        int lz =INT_MAX;
-        int dummy;
+        int particlenum;
 
-        sscanf(line,"%i%lf%lf%lf%i%i%i",&dummy,&rx,&ry,&rz);
+        sscanf(line,"%i%lf%lf%lf%i%i%i",&particlenum,&rx,&ry,&rz);
         
         snap->CentreOfMassX[comp] += rx;
         snap->CentreOfMassY[comp] += ry;
         snap->CentreOfMassZ[comp] += rz;
 
-        snap->PosX[comp][part] = rx;
-        snap->PosY[comp][part] = ry;
-        snap->PosZ[comp][part] = rz;
+        snap->PosX[comp][particlenum-1] = rx;
+        snap->PosY[comp][particlenum-1] = ry;
+        snap->PosZ[comp][particlenum-1] = rz;
       }
       else 
       {
@@ -269,9 +267,9 @@ void CalcMSD(INPUT_DATA *Input, STATE_BLOCK *State, MSD *SampleMSD, size_t Times
           for(size_t elem=0;elem<CurrBlockLength;elem++)
           {
 
-            double msdx = SQR(State->ParticleX[CurrBlock][elem][comp][part]-State->ParticleX[CurrBlock][0][comp][part]);
-            double msdy = SQR(State->ParticleY[CurrBlock][elem][comp][part]-State->ParticleY[CurrBlock][0][comp][part]);
-            double msdz = SQR(State->ParticleZ[CurrBlock][elem][comp][part]-State->ParticleZ[CurrBlock][0][comp][part]);
+            double msdx = State->ParticleX[CurrBlock][elem][comp][part] * State->ParticleX[CurrBlock][0][comp][part];
+            double msdy = State->ParticleY[CurrBlock][elem][comp][part] * State->ParticleY[CurrBlock][0][comp][part];
+            double msdz = State->ParticleZ[CurrBlock][elem][comp][part] * State->ParticleZ[CurrBlock][0][comp][part];
             
             SampleMSD->SelfCounter[CurrBlock][elem][comp]+=1.0;
 
@@ -283,20 +281,17 @@ void CalcMSD(INPUT_DATA *Input, STATE_BLOCK *State, MSD *SampleMSD, size_t Times
           }
         } // end of loop over individual particles
 
-        // here we do the actuall correlation
+        // here we do the cross correlation
         
         for(size_t elem=0;elem<CurrBlockLength;elem++)
         {
           for(size_t comp2=0;comp2<ParticleTypes;comp2++)
           {
-            double blcx = ((State->CenterOfMassX[CurrBlock][elem][comp] -State->CenterOfMassX[CurrBlock][0][comp])*
-                           (State->CenterOfMassX[CurrBlock][elem][comp2]-State->CenterOfMassX[CurrBlock][0][comp2]));
+            double blcx = ((State->CenterOfMassX[CurrBlock][elem][comp] * State->CenterOfMassX[CurrBlock][0][comp2]));
             
-            double blcy = ((State->CenterOfMassY[CurrBlock][elem][comp] -State->CenterOfMassY[CurrBlock][0][comp])*
-                           (State->CenterOfMassY[CurrBlock][elem][comp2]-State->CenterOfMassY[CurrBlock][0][comp2]));
+            double blcy = ((State->CenterOfMassY[CurrBlock][elem][comp] * State->CenterOfMassY[CurrBlock][0][comp2]));
             
-            double blcz = ((State->CenterOfMassZ[CurrBlock][elem][comp] -State->CenterOfMassZ[CurrBlock][0][comp])*
-                           (State->CenterOfMassZ[CurrBlock][elem][comp2]-State->CenterOfMassZ[CurrBlock][0][comp2]));
+            double blcz = ((State->CenterOfMassZ[CurrBlock][elem][comp] * State->CenterOfMassZ[CurrBlock][0][comp2]));
 
             SampleMSD->CrossCounter[CurrBlock][elem][comp][comp2]+=1.0;
 
@@ -325,12 +320,12 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
     FILE *fileptr=NULL;
     char buffer[256];
     
-    printf("\t Printing self diffusion for Component %zu to file ...",comp);
+    printf("\t Printing self-VACF for Component %zu to file ...",comp);
 
-    sprintf(buffer,"msd_self_comp_%zu.dat",comp+1);
+    sprintf(buffer,"vacf_self_comp_%zu.dat",comp+1);
     fileptr=fopen(buffer,"w");
     fprintf(fileptr,"# Self diffusion coefficient for component %zu\n",comp+1);
-    fprintf(fileptr,"# Time[ps] xdir,ydir,zdir,avg,Counter\n");
+    fprintf(fileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
     for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
     {
@@ -360,7 +355,7 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
   }
 
   
-  // print the onsager coefficients for each component
+  // print the onsager coefficients (cross-VACF) for each component
   for (size_t comp=0;comp<Input->ParticleTypes;comp++) 
   {
     for (size_t comp2=0;comp2<Input->ParticleTypes;comp2++)
@@ -370,10 +365,10 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
       
       printf("\t Printing Onsager coeff for Component %zu -- %zu to file ...",comp,comp2);
 
-      sprintf(buffer,"msd_onsager_comp_%zu_%zu.dat",comp+1,comp2+1);
+      sprintf(buffer,"vacf_onsager_comp_%zu_%zu.dat",comp+1,comp2+1);
       fileptr=fopen(buffer,"w");
       fprintf(fileptr,"# Onsager coefficient for components %zu--%zu \n",comp+1,comp2+1);
-      fprintf(fileptr,"# Time[ps] xdir,ydir,zdir,avg,Counter\n");
+      fprintf(fileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
       for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
       {
@@ -407,11 +402,11 @@ void PrintData(INPUT_DATA *Input, MSD *SampleMSD, size_t TimesSampled, size_t *B
   
   // print the total self diffusion coefficient (for single component systems, this should be the normal one)
   
-  printf("\t Printing total self diffusion to file ...");
+  printf("\t Printing average VACF to file ...");
 
-  tfileptr=fopen("msd_total_self.dat","w");
+  tfileptr=fopen("vacf_total_self.dat","w");
   fprintf(tfileptr,"# Total Self diffusion coefficient \n");
-  fprintf(tfileptr,"# Time[ps] xdir,ydir,zdir,avg,Counter\n");
+  fprintf(tfileptr,"# Time[fs] xdir,ydir,zdir,avg,Counter\n");
 
   for (size_t CurrBlock=0;CurrBlock<NumberOfBlocks;CurrBlock++)
   {

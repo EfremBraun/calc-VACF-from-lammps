@@ -126,11 +126,6 @@ INPUT_DATA *ReadInput(void)
       printf(" Check if file is good.\n");
       exit(1);
     }
-    else
-    {
-      // read and discard the first three lines of the file
-      for (size_t j=0;j<3;j++) ReadNewLine(line,MaxLineLength,Input->Files[i]);
-    }
     printf(" done\n");
 
   }
