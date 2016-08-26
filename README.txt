@@ -1,6 +1,5 @@
 ----------Installation----------
 To compile you will need cmake (sudo apt-get install cmake if it is not installed already): 
-$ tar -xf corrvacf.tar.bz2
 $ cd corrvacf/build
 $ cmake ../
 $ make
@@ -41,3 +40,6 @@ ParticleX           = vector of particle velocities that covers all timesteps
 CenterOfMassX[comp] = vector of average velocities of the particles of type 'comp' that covers all timesteps
 msdx                = velocity at the time origin times the velocity at the current time
 SampleMSD->SelfX    = running sum of msdx which gets divided by counts at the end to get average VACF
+
+----------Credits--------------
+Source code for msd calculation initially written by Sondre Schnell. Minor modifications made by Efrem Braun to calculate the VACF instead.
