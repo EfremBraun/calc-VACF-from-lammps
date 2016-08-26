@@ -288,13 +288,16 @@ void CalcMSD(INPUT_DATA *Input, STATE_BLOCK *State, MSD *SampleMSD, size_t Times
         {
           for(size_t comp2=0;comp2<ParticleTypes;comp2++)
           {
-            double blcx = ((State->CenterOfMassX[CurrBlock][elem][comp] * State->CenterOfMassX[CurrBlock][0][comp2]));
+            double blcx = (State->CenterOfMassX[CurrBlock][elem][comp] * State->CenterOfMassX[CurrBlock][0][comp2]) +
+                          (State->CenterOfMassX[CurrBlock][elem][comp2] * State->CenterOfMassX[CurrBlock][0][comp]);
             
-            double blcy = ((State->CenterOfMassY[CurrBlock][elem][comp] * State->CenterOfMassY[CurrBlock][0][comp2]));
+            double blcy = (State->CenterOfMassY[CurrBlock][elem][comp] * State->CenterOfMassY[CurrBlock][0][comp2]) +
+                          (State->CenterOfMassY[CurrBlock][elem][comp2] * State->CenterOfMassY[CurrBlock][0][comp]);
             
-            double blcz = ((State->CenterOfMassZ[CurrBlock][elem][comp] * State->CenterOfMassZ[CurrBlock][0][comp2]));
+            double blcz = (State->CenterOfMassZ[CurrBlock][elem][comp] * State->CenterOfMassZ[CurrBlock][0][comp2]) + 
+                          (State->CenterOfMassZ[CurrBlock][elem][comp2] * State->CenterOfMassZ[CurrBlock][0][comp]);
 
-            SampleMSD->CrossCounter[CurrBlock][elem][comp][comp2]+=1.0;
+            SampleMSD->CrossCounter[CurrBlock][elem][comp][comp2]+=2.0;
 
             SampleMSD->CrossX[CurrBlock][elem][comp][comp2]+=blcx;
             SampleMSD->CrossY[CurrBlock][elem][comp][comp2]+=blcy;
