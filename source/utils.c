@@ -27,7 +27,7 @@ void PrintDefaultInput(void)
     fprintf(fptr,"1.0\n");
     fprintf(fptr,"# for part 1   number of parts.   mass\n");
     fprintf(fptr,"               2000               32.0\n");
-    fprintf(fptr,"filename.dat\n");
+    fprintf(fptr,"traj.dump\n");
     fclose(fptr);
   }
 }
