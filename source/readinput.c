@@ -35,7 +35,7 @@ INPUT_DATA *ReadInput(void)
 
   INPUT_DATA *Input = (INPUT_DATA *) calloc(1,sizeof(INPUT_DATA));
 
-  if(!(fileptr=fopen("input.msd","r")))
+  if(!(fileptr=fopen("input.vacf","r")))
   {
     printf("ReadInput: Input-file not opened correctly.\n");
     exit(1);

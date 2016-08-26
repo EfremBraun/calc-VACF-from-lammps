@@ -68,9 +68,6 @@ int ReadSnap(INPUT_DATA *Input, SNAPSHOT *snap)
   char line[MaxLineLength];
 
   size_t ptypes = Input->ParticleTypes;
-  double sidex = Input->sidex;
-  double sidey = Input->sidey;
-  double sidez = Input->sidez;
 
   for (size_t comp=0;comp<ptypes;comp++)
   {
@@ -104,18 +101,8 @@ int ReadSnap(INPUT_DATA *Input, SNAPSHOT *snap)
         int lz =INT_MAX;
         int dummy;
 
-        sscanf(line,"%i%lf%lf%lf%i%i%i",&dummy,&rx,&ry,&rz,&lx,&ly,&lz);
+        sscanf(line,"%i%lf%lf%lf%i%i%i",&dummy,&rx,&ry,&rz);
         
-        if((lx==INT_MAX)||(ly==INT_MAX)||(lz==INT_MAX))
-        {
-          printf("Scaling not read correctly. Aborting!!");
-          return false;
-        }
-
-        rx += (double)lx * sidex; 
-        ry += (double)ly * sidey; 
-        rz += (double)lz * sidez; 
-
         snap->CentreOfMassX[comp] += rx;
         snap->CentreOfMassY[comp] += ry;
         snap->CentreOfMassZ[comp] += rz;
