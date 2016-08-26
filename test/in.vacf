@@ -1,0 +1,27 @@
+#settings
+units              real
+atom_style         bond
+neigh_modify       delay 0 every 1
+
+#atom and FF definitions
+read_data          "data.vacf"
+pair_style         lj/cut 14.0
+pair_coeff         1 1 0.195 3.75
+
+#run settings
+timestep           1
+thermo             1
+velocity           all set 1.0 0 0
+
+#compute vacf
+compute            1 all vacf
+
+#NVT with Nose-Hoover thermostat chain
+fix                1 all nvt temp 350 350 100.0
+fix                2 all ave/time 1 1 1 c_1[1] c_1[2] c_1[3] c_1[4] mode scalar file vacf.out
+dump               1 all custom 1 traj.dump id vx vy vz
+run                1
+velocity           all set 2.0 0 0
+run                1
+velocity           all set 3.0 0 0
+run                1
